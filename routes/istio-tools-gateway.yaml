@@ -1,0 +1,97 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: istio-tools-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - prometheus.team-liran.ml
+    - kiali.team-liran.ml
+    - grafana.team-liran.ml
+    - jaeger.team-liran.ml
+    tls:
+      httpsRedirect: true # sends 301 redirect for http requests
+  - port:
+      number: 443
+      name: https-443
+      protocol: HTTP
+    hosts:
+    - prometheus.team-liran.ml
+    - kiali.team-liran.ml
+    - grafana.team-liran.ml
+    - jaeger.team-liran.ml
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: prometheus
+  namespace: istio-system
+spec:
+  hosts:
+  - "prometheus.team-liran.ml"
+  gateways:
+  - istio-tools-gateway
+  http:
+  - route:
+    - destination:
+        host: prometheus
+        port:
+          number: 9090
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: kiali
+  namespace: istio-system
+spec:
+  hosts:
+  - "kiali.team-liran.ml"
+  gateways:
+  - istio-tools-gateway
+  http:
+  - route:
+    - destination:
+        host: kiali
+        port:
+          number: 20001
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: jaeger
+  namespace: istio-system
+spec:
+  hosts:
+  - "jaeger.team-liran.ml"
+  gateways:
+  - istio-tools-gateway
+  http:
+  - route:
+    - destination:
+        host: jaeger-query
+        port:
+          number: 16686
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: grafana
+  namespace: istio-system
+spec:
+  hosts:
+  - "grafana.team-liran.ml"
+  gateways:
+  - istio-tools-gateway
+  http:
+  - route:
+    - destination:
+        host: grafana
+        port:
+          number: 3000
