@@ -3,6 +3,7 @@ Deploy ArgoCD:
 <pre><code>
 
 kubectl create namespace argocd
+kubectl label namespace argocd istio-injection=enabled
 kubectl apply -n argocd -f argocd.yaml
 
 </code></pre>
